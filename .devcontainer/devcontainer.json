@@ -1,0 +1,22 @@
+{
+  "name": "Odin Ruby Environment",
+  //"image": "://microsoft.com",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "configureZshAsDefaultShell": true
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "shopify.ruby-lsp",
+        "misogi.ruby-rubocop",
+        "hoovercj.vscode-rspec"
+      ],
+      "settings": {
+        "rubyLsp.formatter": "rubocop"
+      }
+    }
+  },
+  "postCreateCommand": "bundle install || gem install rspec rubocop irb"
+}
