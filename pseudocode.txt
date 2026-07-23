@@ -1,0 +1,77 @@
+BEGIN Generate a starting board
+
+SET board to NEW_ARRAY of length 64
+
+ASSIGN white pieces to board[0 - 15]
+
+ASSIGN black pieces to board[47 - 63]
+
+DISPLAY board
+
+SET active_player to white
+
+END
+
+
+
+BEGIN Make a move
+
+LOOP
+
+    INPUT starting square, target square
+
+    IF starting_square between a1 and h8 
+    AND target_square between a1 and h8 
+    AND starting_square contains player piece 
+    AND move doesn't result in own king attacked
+    AND move valid for piece type
+
+        CONTINUE
+
+    ELSE
+    
+        REPEAT LOOP
+
+    ENDIF
+
+ENDLOOP
+
+SET starting_square_hash
+
+SET target_square_hash
+
+
+
+IF board at target_square_hash has enemy piece
+
+    REMOVE enemy_piece
+
+ENDIF
+
+SET board at target_square_hash to piece
+
+SET board at starting_square_hash to empty
+
+IF enemy king attacked AND enemy king has no valid moves
+
+    OUTPUT checkmate
+
+    GAME OVER
+
+ELSE IF enemy king attacked AND enemy king has valid moves
+
+    OUTPUT check
+
+ENDIF
+
+IF active_player == white
+
+    SET active_player to black
+
+ELSE
+
+    SET active_player to white
+
+ENDIF
+
+END
