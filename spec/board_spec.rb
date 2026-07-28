@@ -2,7 +2,7 @@ require_relative '../lib/board'
 
 describe Board do
   describe '#initialize' do
-    subject(:new_board) { described_class.new('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1') }
+    subject(:new_board) { described_class.new }
 
     it 'generates a @board array of length 64' do
       expect(new_board.board.size).to eq 64

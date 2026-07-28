@@ -3,7 +3,7 @@ require_relative 'piece'
 class Board
   attr_reader :board, :active_player
 
-  def initialize(string)
+  def initialize(string = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
     @board = []
     populate_board(string)
     @active_player = string.split(' ')[1].to_sym
@@ -13,7 +13,6 @@ class Board
     @turn = string.split(' ')[5]
   end
 
-  # rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
   def populate_board(string)
     string = string.split(' ')[0].split('/').reverse.join('')
     index = 0
