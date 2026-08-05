@@ -1,25 +1,4 @@
-require 'colorize'
-
 class Piece
-  # SYMBOLS = {
-  #   white: {
-  #     r: "\u{2656}".colorize(:white),
-  #     n: "\u{2658}".colorize(:white),
-  #     b: "\u{2657}".colorize(:white),
-  #     k: "\u{2654}".colorize(:white),
-  #     q: "\u{2655}".colorize(:white),
-  #     p: "\u{2659}".colorize(:white)
-  #   },
-  #   black: {
-  #     r: "\u{265C}".colorize(:black),
-  #     n: "\u{265E}".colorize(:black),
-  #     b: "\u{265D}".colorize(:black),
-  #     k: "\u{265A}".colorize(:black),
-  #     q: "\u{265B}".colorize(:black),
-  #     p: "\u{265F}".colorize(:black)
-  #   }
-  # }.freeze
-
   SYMBOLS = {
     white: {
       r: "\e[38;2;255;255;255m\u{2656}",
