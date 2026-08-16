@@ -1,3 +1,4 @@
-require_relative 'lib/board'
+require_relative 'lib/piece'
 
-chessboard = Board.new
+rook = Piece.new('r', 0)
+p rook.moves
