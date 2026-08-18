@@ -2,7 +2,7 @@ require_relative 'piece'
 require 'pry-byebug'
 
 class Board
-  attr_reader :board, :active_player, :whites, :blacks, :white_king, :black_king
+  attr_reader :board, :active_player, :whites, :blacks, :white_king, :black_king, :en_passant
 
   def initialize(string = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
     @board = []
@@ -11,7 +11,7 @@ class Board
     populate_board(string)
     @active_player = string.split(' ')[1].to_sym
     @castling = string.split(' ')[2]
-    @en_passant = string.split(' ')[3]
+    @en_passant = string.split(' ')[3] == '-' ? nil : to_coords(string.split(' ')[3])
     @half_moves = string.split(' ')[4].to_i
     @turn = string.split(' ')[5].to_i
   end
@@ -50,8 +50,14 @@ class Board
     end
     if move_piece(start_square, end_square)
       @active_player = @active_player == :w ? :b : :w
+      @en_passant = if active_piece.type == :p && (start_square[0] - end_square[0]).abs == 2
+                      [(start_square[0] + end_square[0]) / 2, start_square[1]]
+                    else
+                      nil
+                    end
       @half_moves += 1
       @turn += 1 if @active_player == :w
+      active_piece.move(end_square)
     else
       puts 'Invalid move, your king cannot be in check after your turn.'
     end
@@ -70,6 +76,10 @@ class Board
     end
 
     player_pieces.any? { |piece| find_threats(piece, player).include?(opponent_king.square) }
+  end
+
+  def to_coords(square)
+    [8 - square[1].to_i, square[0].ord - 97]
   end
 
   private
@@ -110,10 +120,21 @@ class Board
     if piece.moves[:type] == :iter
       iter_moves(piece, piece.moves[:list], player)
     elsif piece.type == :p
-      moves = single_moves(piece, piece.moves[:list], player)
+      moves = []
+      # make sure a pawn can move forward only into an empty space
+      piece.moves[:list].each do |move|
+        square = [piece.square[0] + move[0], piece.square[1] + move[1]]
+        break unless @board[hash(square)].nil?
+
+        moves << square
+      end
+      # make sure a pawn can only move diagonally to take an opposing piece
       piece.threats[:list].each do |threat|
         square = [piece.square[0] + threat[0], piece.square[1] + threat[1]]
-        moves << square if @board[hash(square)].instance_of?(Piece) && @board[hash(square)].color != @active_player
+        if @board[hash(square)].instance_of?(Piece) && @board[hash(square)].color != @active_player ||
+           square == @en_passant
+          moves << square
+        end
       end
       moves
     else
@@ -166,14 +187,27 @@ class Board
   def move_piece(start_square, end_square)
     piece = @board[hash(start_square)]
     target_piece = @board[hash(end_square)]
+    # taking en passant
+    if piece.type == :p && end_square == @en_passant
+      target_piece = @board[hash([start_square[0], end_square[1]])]
+      @board[hash([start_square[0], end_square[1]])] = nil
+    else
+      target_piece = @board[hash(end_square)]
+    end
     @board[hash(end_square)] = piece
     @board[hash(start_square)] = nil
     opponent = @active_player == :w ? :b : :w
 
     return true unless check?(opponent)
 
+    # reset after taking en passant or regular taking
+    if piece.type == :p && end_square == @en_passant
+      @board[hash([start_square[0], end_square[1]])] = target_piece
+      @board[hash(end_square)] = nil
+    else
+      @board[hash(end_square)] = target_piece
+    end
     @board[hash(start_square)] = piece
-    @board[hash(end_square)] = target_piece
     false
   end
 

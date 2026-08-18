@@ -27,6 +27,10 @@ class Piece
     @threats = threat_set
   end
 
+  def move(square)
+    @square = square
+  end
+
   private
 
   def unhash(index)

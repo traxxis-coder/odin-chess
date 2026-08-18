@@ -83,6 +83,20 @@ describe Board do
         expect(white_in_check.check?(:b)).to be true
       end
     end
+
+    context 'check by pawn' do
+      subject(:checking_pawn) { described_class.new('8/8/4k3/3P4/8/8/8/7K w - - 0 1') }
+      it 'returns true for white' do
+        expect(checking_pawn.check?(:w)).to be true
+      end
+    end
+
+    context 'pawn not checking' do
+      subject(:non_threatening_pawn) { described_class.new('8/8/4k3/4P3/8/8/8/7K w - - 0 1') }
+      it 'returns false for white' do
+        expect(non_threatening_pawn.check?(:w)).to be false
+      end
+    end
   end
 
   describe '#take_turn' do
@@ -114,6 +128,43 @@ describe Board do
       it 'outputs an error message if a move with opponents piece is attempted' do
         expect(starting_board).to receive(:puts).with('Invalid move, starting square needs to contain one of your pieces.')
         starting_board.take_turn([1, 4], [2, 4])
+      end
+
+      context 'moving a pawn by 2 spaces' do
+        before do
+          starting_board.take_turn([6, 3], [4, 3])
+        end
+        it 'moves the pawn' do
+          expect(starting_board.board[35].type).to eq(:p)
+        end
+
+        it 'changes @en_passant to the correct square' do
+          expect(starting_board.en_passant).to eq([5, 3])
+        end
+
+        it 'changes @en_passant again after another move' do
+          starting_board.take_turn([1, 0], [2, 0])
+          expect(starting_board.en_passant).to be nil
+        end
+      end
+    end
+
+    context 'taking en passant' do
+      subject(:en_passant_ready) { described_class.new('rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 1 0') }
+      before do
+        en_passant_ready.take_turn([3, 4], [2, 3])
+      end
+
+      it 'moves the pawn correctly' do
+        expect(en_passant_ready.board[19].type).to eq(:p)
+      end
+
+      it 'takes en passant' do
+        expect(en_passant_ready.board[27]).to be nil
+      end
+
+      it 'resets @en_passant to nil' do
+        expect(en_passant_ready.en_passant).to be nil
       end
     end
   end
