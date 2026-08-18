@@ -1,8 +1,6 @@
-require 'pry-byebug'
-
 class Piece
   SYMBOLS = {
-    white: {
+    w: {
       r: "\e[38;2;255;255;255m\u{2656}",
       n: "\e[38;2;255;255;255m\u{2658}",
       b: "\e[38;2;255;255;255m\u{2657}",
@@ -10,7 +8,7 @@ class Piece
       q: "\e[38;2;255;255;255m\u{2655}",
       p: "\e[38;2;255;255;255m\u{2659}"
     },
-    black: {
+    b: {
       r: "\e[38;2;0;0;0m\u{265C}",
       n: "\e[38;2;0;0;0m\u{265E}",
       b: "\e[38;2;0;0;0m\u{265D}",
@@ -22,7 +20,7 @@ class Piece
   attr_reader :color, :type, :moves, :threats, :square
 
   def initialize(piece, index)
-    @color = piece == piece.upcase ? :white : :black
+    @color = piece == piece.upcase ? :w : :b
     @type = piece.downcase.to_sym
     @square = unhash(index)
     @moves = move_set
@@ -70,7 +68,7 @@ class Piece
   def king_moves
     moves = { list: [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]],
               type: :single }
-    moves.list += [[0, 2], [0, -2]] if color == :black && square == [0, 4] || color == :white && square == [7, 4]
+    moves[:list] += [[0, 2], [0, -2]] if color == :b && square == [0, 4] || color == :w && square == [7, 4]
     moves
   end
 
@@ -80,7 +78,7 @@ class Piece
   end
 
   def pawn_moves
-    if color == :white
+    if color == :w
       if square[0] == 6
         { list: [[-1, 0], [-2, 0]],
           type: :single }
@@ -106,7 +104,7 @@ class Piece
   end
 
   def pawn_threats
-    if color == :white
+    if color == :w
       { list: [[-1, -1], [-1, 1]],
         type: :single }
     else
